@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Vapi from '@vapi-ai/web';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -11,6 +11,8 @@ function App() {
   const [transcript, setTranscript] = useState<Array<{ role: string; text: string }>>([]);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [audioInitialized, setAudioInitialized] = useState(false);
+  // Ref for auto-scrolling the chat box
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Initialize audio context for Windows compatibility
   const initializeAudio = async () => {
@@ -172,6 +174,11 @@ function App() {
       vapi.stop();
     }
   };
+
+  // Auto-scroll to the latest message whenever the transcript updates
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcript]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -401,6 +408,8 @@ function App() {
                 </div>
               ))
             )}
+            {/* Scroll anchor */}
+            <div ref={messagesEndRef} />
           </div>
         </div>
       </div>
